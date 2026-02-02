@@ -1,0 +1,28 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest
+      - .
+      - '-f'
+      - Dockerfile
+    id: Build
+images:
+  - '$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+  - '$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:latest'
+substitutions:
+  _AR_HOSTNAME: 'asia-northeast3-docker.pkg.dev'
+  _AR_PROJECT_ID: 'jk6841'
+  _AR_REPOSITORY: 'cloud-run-source-deploy'
+  _REPO_NAME: 'kaist-seoul-meals'
+  _SERVICE_NAME: 'kaist-seoul-meals'
+tags:
+  - kaist-seoul-meals
+options:
+  logging: CLOUD_LOGGING_ONLY

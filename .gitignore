@@ -1,0 +1,16 @@
+## ides and editors
+.vscode
+.idea
+*.iml
+
+## rust
+target
+
+## os
+.DS_Store
+
+## local
+.env.local
+local
+.vercel
+.env*.local
