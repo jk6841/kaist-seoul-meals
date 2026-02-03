@@ -72,17 +72,11 @@ async fn fetch_meals(url: &str) -> Vec<String> {
 
 async fn send_discord_webhook(webhook_url: &str, meals: &Vec<String>) -> Result<()> {
     let client = Client::new();
-    let breakfast = &meals[0];
     let lunch = &meals[1];
     let dinner = &meals[2];
 
     let payload = serde_json::json!({
         "embeds": [
-            {
-                "title": "오늘의 아침".to_string(),
-                "description": breakfast,
-                "color": 16776960,
-            },
             {
                 "title": "오늘의 점심".to_string(),
                 "description": lunch,
