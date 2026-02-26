@@ -20,11 +20,11 @@ async fn main() -> Result<()> {
     dotenvy::dotenv().ok();
 
     let kaist_meals_url = get_env("KAIST_MEALS_URL");
-    let discord_webhook_url = get_env("DISCORD_WEBHOOK_URL");
+    let discord_webhook_url = get_env("DOORAY_WEBHOOK_URL");
 
     let meals = fetch_meals(&kaist_meals_url).await;
 
-    send_discord_webhook(&discord_webhook_url, &meals).await?;
+    send_dooray_webhook(&discord_webhook_url, &kaist_meals_url, &meals).await?;
 
     info!("job 완료");
     Ok(())
@@ -70,22 +70,26 @@ async fn fetch_meals(url: &str) -> Vec<String> {
     results
 }
 
-async fn send_discord_webhook(webhook_url: &str, meals: &Vec<String>) -> Result<()> {
+async fn send_dooray_webhook(webhook_url: &str, kaist_meals_url: &str, meals: &Vec<String>) -> Result<()> {
     let client = Client::new();
     let lunch = &meals[1];
     let dinner = &meals[2];
 
     let payload = serde_json::json!({
-        "embeds": [
+        "botName": "KAIST 서울캠 학식",
+        "botIconImage": "https://www.kaist.ac.kr/favicon.ico",
+        "attachments": [
             {
                 "title": "오늘의 점심".to_string(),
-                "description": lunch,
-                "color": 15105570,
+                "titleLink": kaist_meals_url,
+                "text": lunch,
+                "color": "red",
             },
             {
                 "title": "오늘의 저녁".to_string(),
-                "description": dinner,
-                "color": 3447003,
+                "titleLink": kaist_meals_url,
+                "text": dinner,
+                "color": "blue",
             },
         ]
     });
@@ -100,10 +104,10 @@ async fn send_discord_webhook(webhook_url: &str, meals: &Vec<String>) -> Result<
     let status = res.status();
 
     if status.is_success() {
-        info!("Discord 웹훅 전송 성공");
+        info!("웹훅 전송 성공");
     } else {
         let text = res.text().await?;
-        error!("Discord 웹훅 전송 실패: {} - {}", status, text);
+        error!("웹훅 전송 실패: {} - {}", status, text);
     }
 
     Ok(())
