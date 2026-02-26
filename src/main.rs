@@ -135,7 +135,7 @@ fn format_menu(text: &String) -> String {
             result.push('\n');
 
         } else {
-            result.push_str("> ");
+            result.push_str("- ");
             result.push_str(trimmed);
             result.push('\n');
 
