@@ -6,6 +6,8 @@ use tracing::{error, info, Level};
 use tracing_subscriber::fmt::format;
 use tracing_subscriber::FmtSubscriber;
 
+const MSG_NO_MEALS: &str = "메뉴가 없어요!";
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let subscriber = FmtSubscriber::builder()
@@ -61,7 +63,12 @@ async fn fetch_meals(url: &str) -> Vec<String> {
                         .to_string()
                 })
                 .map(|element| {
-                    format_menu(&element)
+                    let formatted_menu = format_menu(&element);
+                    if formatted_menu.is_empty() {
+                        MSG_NO_MEALS.to_string()
+                    } else {
+                        formatted_menu
+                    }
                 })
                 .unwrap_or_else(|_| "".to_string())
         })
