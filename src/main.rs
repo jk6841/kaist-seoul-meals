@@ -22,11 +22,11 @@ async fn main() -> Result<()> {
     dotenvy::dotenv().ok();
 
     let kaist_meals_url = get_env("KAIST_MEALS_URL");
-    let discord_webhook_url = get_env("DOORAY_WEBHOOK_URL");
+    let dooray_webhook_url = get_env("DOORAY_WEBHOOK_URL");
 
     let meals = fetch_meals(&kaist_meals_url).await;
 
-    send_dooray_webhook(&discord_webhook_url, &kaist_meals_url, &meals).await?;
+    send_dooray_webhook(&dooray_webhook_url, &kaist_meals_url, &meals).await?;
 
     info!("job 완료");
     Ok(())
