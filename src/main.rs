@@ -25,12 +25,8 @@ async fn main() -> Result<()> {
 
     let kaist_meals_url = get_env("KAIST_MEALS_URL");
     let dooray_webhook_url = get_env("DOORAY_WEBHOOK_URL");
-    let telegram_api_url = get_env("TELEGRAM_API_URL");
-    let telegram_chat_id = get_env("TELEGRAM_CHAT_ID");
 
     let meals = fetch_meals(&kaist_meals_url).await;
-
-    notify_telegram_channel_day(&telegram_api_url, &telegram_chat_id, &meals).await?;
 
     send_dooray_webhook(&dooray_webhook_url, &kaist_meals_url, &meals).await?;
 
@@ -81,45 +77,6 @@ async fn fetch_meals(url: &str) -> Vec<String> {
         .collect();
 
     results
-}
-
-async fn notify_telegram_channel_meal(title: &str, url: &str, chat_id: &str, meal: &String, client: &Client) -> Result<()> {
-    let payload = serde_json::json!({
-        "chat_id": chat_id,
-        "text": format!("[{}]\n{}",title, meal)
-    });
-
-    let res = client
-        .post(url)
-        .header("Content-Type", "application/json")
-        .json(&payload)
-        .send()
-        .await?;
-
-    let status = res.status();
-
-    if status.is_success() {
-        info!("telegram notification success");
-    } else {
-        let text = res.text().await?;
-        error!("telegram notification failure: {} - {}", status, text);
-    }
-
-    Ok(())
-
-}
-
-async fn notify_telegram_channel_day(url: &str, chat_id: &str, meals: &Vec<String>) -> Result<()> {
-    let client = Client::new();
-    let lunch = &meals[1];
-    let dinner = &meals[2];
-
-    notify_telegram_channel_meal(TITLE_LUNCH, url, chat_id, lunch, &client).await?;
-
-    notify_telegram_channel_meal(TITLE_DINNER, url, chat_id, dinner, &client).await?;
-
-    Ok(())
-
 }
 
 async fn send_dooray_webhook(webhook_url: &str, kaist_meals_url: &str, meals: &Vec<String>) -> Result<()> {
