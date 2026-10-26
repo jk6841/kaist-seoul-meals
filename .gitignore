@@ -9,8 +9,11 @@ target
 ## os
 .DS_Store
 
+## env (웹훅 URL 등 비밀값)
+.env
+.env.*
+!.env.example
+
 ## local
-.env.local
 local
 .vercel
-.env*.local
