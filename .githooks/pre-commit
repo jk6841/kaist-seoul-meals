@@ -1,0 +1,8 @@
+#!/bin/sh
+# 포맷이 맞지 않으면 커밋을 막는다.
+# 설치: git config core.hooksPath .githooks
+
+if ! cargo fmt --all --check >/dev/null 2>&1; then
+    echo "cargo fmt 검사 실패: 'cargo fmt'를 실행한 뒤 다시 커밋하세요." >&2
+    exit 1
+fi
