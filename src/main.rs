@@ -18,8 +18,7 @@ async fn main() {
         .event_format(format().json())
         .with_max_level(Level::INFO)
         .finish();
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("setting default subscriber failed");
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     info!("job 시작");
 
@@ -85,10 +84,12 @@ async fn fetch_meals(url: &str) -> Result<Vec<String>> {
         .collect()
 }
 
-async fn send_dooray_webhook(webhook_url: &str, kaist_meals_url: &str, meals: &Vec<String>) -> Result<()> {
-    let client = Client::builder()
-        .timeout(HTTP_TIMEOUT)
-        .build()?;
+async fn send_dooray_webhook(
+    webhook_url: &str,
+    kaist_meals_url: &str,
+    meals: &Vec<String>,
+) -> Result<()> {
+    let client = Client::builder().timeout(HTTP_TIMEOUT).build()?;
     let lunch = &meals[1];
     let dinner = &meals[2];
 
@@ -145,19 +146,15 @@ fn format_menu(text: &str) -> String {
         if trimmed.ends_with("층") {
             result.push_str(trimmed);
             result.push('\n');
-
         } else if trimmed.ends_with("코너") {
             result.push_str("- ");
             result.push_str(trimmed);
             result.push('\n');
-
         } else {
             result.push_str("- ");
             result.push_str(trimmed);
             result.push('\n');
-
         }
-
     }
 
     result.trim_end().to_string()
