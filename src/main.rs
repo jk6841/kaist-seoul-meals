@@ -37,17 +37,17 @@ async fn run() -> Result<()> {
     let kaist_meals_url = get_env("KAIST_MEALS_URL")?;
     let dooray_webhook_url = get_env("DOORAY_WEBHOOK_URL")?;
 
-    let meals = fetch_meals(&kaist_meals_url).await?;
-
-    send_dooray_webhook(&dooray_webhook_url, &kaist_meals_url, &meals).await
-}
-
-async fn fetch_meals(url: &str) -> Result<Vec<String>> {
     let client = Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         .timeout(HTTP_TIMEOUT)
         .build()?;
 
+    let meals = fetch_meals(&client, &kaist_meals_url).await?;
+
+    send_dooray_webhook(&client, &dooray_webhook_url, &kaist_meals_url, &meals).await
+}
+
+async fn fetch_meals(client: &Client, url: &str) -> Result<Vec<String>> {
     let html = client
         .get(url)
         .send()
@@ -85,11 +85,11 @@ async fn fetch_meals(url: &str) -> Result<Vec<String>> {
 }
 
 async fn send_dooray_webhook(
+    client: &Client,
     webhook_url: &str,
     kaist_meals_url: &str,
     meals: &Vec<String>,
 ) -> Result<()> {
-    let client = Client::builder().timeout(HTTP_TIMEOUT).build()?;
     let lunch = &meals[1];
     let dinner = &meals[2];
 
