@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use reqwest::Client;
 use scraper::{Html, Selector};
 use std::env;
+use std::time::Duration;
 use tracing::{error, info, Level};
 use tracing_subscriber::fmt::format;
 use tracing_subscriber::FmtSubscriber;
@@ -9,6 +10,7 @@ use tracing_subscriber::FmtSubscriber;
 const MSG_NO_MEALS: &str = "메뉴가 없어요!";
 const TITLE_LUNCH: &str = "오늘의 점심";
 const TITLE_DINNER: &str = "오늘의 저녁";
+const HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -37,6 +39,7 @@ async fn main() -> Result<()> {
 async fn fetch_meals(url: &str) -> Vec<String> {
     let client = Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        .timeout(HTTP_TIMEOUT)
         .build().unwrap();
 
     let html = client
@@ -80,7 +83,9 @@ async fn fetch_meals(url: &str) -> Vec<String> {
 }
 
 async fn send_dooray_webhook(webhook_url: &str, kaist_meals_url: &str, meals: &Vec<String>) -> Result<()> {
-    let client = Client::new();
+    let client = Client::builder()
+        .timeout(HTTP_TIMEOUT)
+        .build()?;
     let lunch = &meals[1];
     let dinner = &meals[2];
 
